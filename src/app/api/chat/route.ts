@@ -23,11 +23,19 @@ If Sara lacks direct experience, say “No, but her closest experience is …”
     })
 
     const reply = completion.choices[0]?.message?.content ?? '…'
+
+    // Log to /api/log
+    await fetch(`${req.headers.get('origin') || ''}/api/log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userInput: message, botReply: reply }),
+    })
+
     return NextResponse.json({ reply })
   } catch (err) {
-  console.error('OpenAI API ERROR:', err)
-  return NextResponse.json({
-    reply: `OpenAI error: ${err instanceof Error ? err.message : 'unknown'}`,
-  }, { status: 500 })
-}
+    console.error('OpenAI API ERROR:', err)
+    return NextResponse.json({
+      reply: `OpenAI error: ${err instanceof Error ? err.message : 'unknown'}`,
+    }, { status: 500 })
+  }
 }
