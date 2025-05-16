@@ -54,8 +54,8 @@ export default function Home() {
           ))}
 
           {loading && (
-            <div className="bg-gray-200 p-3 rounded-lg w-16 mr-auto">
-              <span className="animate-pulse">...</span>
+            <div className="p-3 text-base leading-relaxed rounded-lg max-w-[80%] bg-gray-200 mr-auto text-gray-500 italic">
+              Thinking...
             </div>
           )}
           <div ref={endRef} />
