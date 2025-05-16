@@ -49,8 +49,8 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-6">
-      <div className="mx-auto max-w-2xl h-[80vh] bg-white p-6 rounded-xl shadow-md flex flex-col">
+    <main className="min-h-screen bg-[#d0e0da] p-6">
+      <div className="mx-auto max-w-2xl h-[80vh] bg-[#f8f8f8] p-6 rounded-xl shadow-md flex flex-col text-[#2b2b2b]">
         <h1 className="text-2xl font-semibold text-gray-800 mb-4">Chat with Sara’s AI</h1>
 
         <div className="flex-1 overflow-y-auto space-y-2 mb-4">
@@ -65,8 +65,8 @@ export default function Home() {
               key={i}
               className={`p-3 text-base leading-relaxed rounded-lg max-w-[80%] ${
                 m.role === 'user'
-                  ? 'bg-blue-100 ml-auto text-black'
-                  : 'bg-gray-200 mr-auto text-gray-800'
+                  ? 'bg-[#c6d9d3] ml-auto text-black'
+                  : 'bg-[#e6eae9] mr-auto text-gray-800'
               }`}
             >
               {m.text}
@@ -74,7 +74,7 @@ export default function Home() {
           ))}
 
           {loading && (
-            <div className="p-3 text-base leading-relaxed rounded-lg max-w-[80%] bg-gray-200 mr-auto text-gray-500 italic">
+            <div className="p-3 text-base leading-relaxed rounded-lg max-w-[80%] bg-[#e6eae9] mr-auto text-[#2b2b2b] italic">
               Thinking...
             </div>
           )}
@@ -89,13 +89,13 @@ export default function Home() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
             disabled={loading}
-            className="flex-1 border border-gray-300 rounded p-2 shadow-sm text-black bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 border border-[#2d2f35] rounded p-2 shadow-sm text-[#2b2b2b] bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2d2f35]"
             placeholder="Type a question"
           />
           <button
             onClick={send}
             disabled={loading || !input.trim()}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+            className="bg-[#2d2f35] text-white px-4 py-2 rounded hover:bg-[#1e1f22] disabled:bg-[#7a7a7a] transition-colors"
           >
             {loading ? '...' : 'Send'}
           </button>
@@ -117,12 +117,12 @@ export default function Home() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 border border-gray-300 rounded p-2 shadow-sm text-black bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border border-[#2d2f35] rounded p-2 shadow-sm text-[#2b2b2b] bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2d2f35]"
           placeholder="you@example.com"
         />
         <button
           onClick={submitEmail}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+          className="bg-[#2d2f35] text-white px-4 py-2 rounded hover:bg-[#1e1f22] disabled:bg-[#7a7a7a] transition-colors"
         >
           Submit
         </button>
