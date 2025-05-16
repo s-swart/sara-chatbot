@@ -34,17 +34,19 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-100 p-6">
-      <div className="mx-auto max-w-2xl h-[80vh] bg-white p-6 rounded-xl shadow flex flex-col">
-        <h1 className="text-2xl font-semibold mb-4">Chat with Sara’s AI</h1>
+      <div className="mx-auto max-w-2xl h-[80vh] bg-white p-6 rounded-xl shadow-md flex flex-col">
+        <h1 className="text-2xl font-semibold text-gray-800 mb-4">Chat with Sara’s AI</h1>
 
         <div className="flex-1 overflow-y-auto space-y-2 mb-4">
           {messages.length === 0 && (
-            <p className="text-center text-gray-500 py-8">Ask about Sara’s experience…</p>
+            <p className="text-center text-gray-700 py-20 text-lg italic">
+              Ask about Sara’s experience…
+            </p>
           )}
 
           {messages.map((m, i) => (
             <div key={i}
-              className={`p-3 rounded-lg max-w-[80%] ${
+              className={`p-3 text-base leading-relaxed rounded-lg max-w-[80%] ${
                 m.role === 'user' ? 'bg-blue-100 ml-auto' : 'bg-gray-200 mr-auto'
               }`}>
               {m.text}
@@ -65,13 +67,13 @@ export default function Home() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
             disabled={loading}
-            className="flex-1 border border-gray-300 rounded p-2"
+            className="flex-1 border border-gray-300 rounded p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Type a question"
           />
           <button
             onClick={send}
             disabled={loading || !input.trim()}
-            className="bg-blue-600 text-white px-4 py-2 rounded disabled:bg-blue-400">
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400 transition-colors">
             {loading ? '...' : 'Send'}
           </button>
         </div>
