@@ -47,7 +47,7 @@ export default function Home() {
           {messages.map((m, i) => (
             <div key={i}
               className={`p-3 text-base leading-relaxed rounded-lg max-w-[80%] ${
-                m.role === 'user' ? 'bg-blue-100 ml-auto' : 'bg-gray-200 mr-auto'
+                m.role === 'user' ? 'bg-blue-100 ml-auto text-black' : 'bg-gray-200 mr-auto text-gray-800'
               }`}>
               {m.text}
             </div>
@@ -67,7 +67,7 @@ export default function Home() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
             disabled={loading}
-            className="flex-1 border border-gray-300 rounded p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 border border-gray-300 rounded p-2 shadow-sm text-black bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Type a question"
           />
           <button
