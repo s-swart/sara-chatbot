@@ -1,18 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const { userInput, botReply } = await req.json()
+  try {
+    const body = await req.json()
+     console.log('Received log payload:', body) 
+    const ip = req.headers.get('x-forwarded-for') || 'unknown'
+    const userAgent = req.headers.get('user-agent') || 'unknown'
+    const timestamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
 
-  const ip = req.headers.get('x-forwarded-for') || 'unknown'
-  const userAgent = req.headers.get('user-agent') || 'unknown'
+    const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL
+    if (!webhookUrl) {
+      console.error('Missing LOG_WEBHOOK_URL')
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+    }
 
-  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || 'undefined' 
+    const payload = body.email
+      ? { timestamp, email: body.email, ip, userAgent }
+      : { timestamp, userInput: body.userInput, botReply: body.botReply, ip, userAgent }
 
-  await fetch(webhookUrl, {
-    method: 'POST',
-    body: JSON.stringify({ userInput, botReply, userAgent, ip }),
-    headers: { 'Content-Type': 'application/json' },
-  })
+    const result = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
 
-  return NextResponse.json({ logged: true })
+    if (!result.ok) {
+      console.error('Google Sheet webhook failed:', await result.text())
+      return NextResponse.json({ error: 'Failed to log' }, { status: 500 })
+    }
+
+    return NextResponse.json({ logged: true })
+  } catch (err) {
+    console.error('Unexpected error:', err)
+    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 })
+  }
 }

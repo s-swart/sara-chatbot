@@ -5,31 +5,47 @@ type Message = { role: 'user' | 'bot'; text: string }
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput]     = useState('')
+  const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [emailSubmitted, setEmailSubmitted] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
-  /* auto-scroll */
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   async function send() {
     if (!input.trim()) return
     const userMsg: Message = { role: 'user', text: input.trim() }
     setMessages(prev => [...prev, userMsg])
-    setInput(''); setLoading(true)
+    setInput('')
+    setLoading(true)
 
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg.text })
+        body: JSON.stringify({ message: userMsg.text }),
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'bot', text: data.reply }])
     } catch (e) {
       console.error(e)
       setMessages(prev => [...prev, { role: 'bot', text: 'Sorry – something went wrong.' }])
-    } finally { setLoading(false) }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function submitEmail() {
+    if (!email) return
+    await fetch('/api/log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    setEmailSubmitted(true)
   }
 
   return (
@@ -45,10 +61,14 @@ export default function Home() {
           )}
 
           {messages.map((m, i) => (
-            <div key={i}
+            <div
+              key={i}
               className={`p-3 text-base leading-relaxed rounded-lg max-w-[80%] ${
-                m.role === 'user' ? 'bg-blue-100 ml-auto text-black' : 'bg-gray-200 mr-auto text-gray-800'
-              }`}>
+                m.role === 'user'
+                  ? 'bg-blue-100 ml-auto text-black'
+                  : 'bg-gray-200 mr-auto text-gray-800'
+              }`}
+            >
               {m.text}
             </div>
           ))}
@@ -61,7 +81,9 @@ export default function Home() {
           <div ref={endRef} />
         </div>
 
-        <div className="flex gap-2">
+       
+
+        <div className="flex gap-2 mt-4">
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -73,11 +95,45 @@ export default function Home() {
           <button
             onClick={send}
             disabled={loading || !input.trim()}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400 transition-colors">
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+          >
             {loading ? '...' : 'Send'}
           </button>
         </div>
+
+ 
+
       </div>
+
+      <div className="mx-auto max-w-2xl mt-6 bg-white p-6 rounded-xl shadow-md">
+  {!emailSubmitted ? (
+    <>
+      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+        Want a follow-up? Leave your email:
+      </label>
+      <div className="flex w-full gap-2">
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 border border-gray-300 rounded p-2 shadow-sm text-black bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="you@example.com"
+        />
+        <button
+          onClick={submitEmail}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+        >
+          Submit
+        </button>
+      </div>
+    </>
+  ) : (
+    <p className="text-sm text-green-700">
+      Thanks! I’ve received your email and will be in touch if relevant.
+    </p>
+  )}
+</div>
     </main>
   )
 }
