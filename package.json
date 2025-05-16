@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "form-data-encoder": "^4.0.2",
     "next": "15.3.2",
     "openai": "^4.100.0",
     "react": "^19.0.0",
