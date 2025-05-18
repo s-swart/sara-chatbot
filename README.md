@@ -60,8 +60,12 @@ npm install
 
 ```env
 OPENAI_API_KEY=your-openai-key
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 GOOGLE_SHEETS_WEBHOOK_URL=your-webhook-url
 ```
+
+> ⚠️ These variables are required both locally and in Vercel → Settings → Environment Variables.
 
 > ⚠️ **Important Tip:**  
 > Even if your OpenAI API key is valid, it will fail if your account has no credits remaining.  
@@ -98,7 +102,6 @@ The chatbot will:
 
 ## ✅ To Do
 
-- [ ] Add Supabase integration for embedding search (future enhancement)  
 - [ ] Enable persistent session context  
 - [ ] Add analytics for user interaction tracking  
 
