@@ -63,6 +63,10 @@ OPENAI_API_KEY=your-openai-key
 GOOGLE_SHEETS_WEBHOOK_URL=your-webhook-url
 ```
 
+> ⚠️ **Important Tip:**  
+> Even if your OpenAI API key is valid, it will fail if your account has no credits remaining.  
+> If you see an error like “quota exceeded,” visit [OpenAI Billing](https://platform.openai.com/account/billing) to check or top up your quota.
+
 4. **Run the dev server:**
 
 ```bash
