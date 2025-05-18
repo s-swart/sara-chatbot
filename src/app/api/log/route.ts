@@ -1,3 +1,15 @@
+// route.ts (log endpoint)
+//
+// PURPOSE:
+// This API route logs user interactions and email submissions to a Google Sheets webhook.
+// It captures the user's IP address, user agent, timestamp, and either the email or chatbot interaction,
+// and forwards this data to a configured webhook URL for logging.
+//
+// USE THIS WHEN:
+// - You want to track who is chatting with your bot and store lead/contact info
+// - You need to analyze user engagement or follow up with interested users
+// - You want to debug chatbot usage by reviewing inputs and responses
+
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {

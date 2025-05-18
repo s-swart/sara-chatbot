@@ -1,3 +1,15 @@
+// route.ts (chat endpoint)
+//
+// PURPOSE:
+// This API route handles POST requests to generate chatbot responses using OpenAI's GPT model.
+// It formats the prompt with a system message defining Sara Swart's assistant behavior,
+// sends the user input to OpenAI, logs the exchange, and returns the reply.
+//
+// USE THIS WHEN:
+// - You want to generate a natural language response based on recruiter questions
+// - You are integrating the assistant into a frontend chat interface
+// - You need to log user questions and AI responses for follow-up or review
+
 import { NextResponse } from 'next/server'
 import { OpenAI } from 'openai'
 

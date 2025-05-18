@@ -1,3 +1,14 @@
+/* globals.css
+ *
+ * PURPOSE:
+ * This file defines global CSS styles and theme variables for the Next.js application.
+ * It sets up color theming (light and dark modes), font defaults, and base body styles.
+ *
+ * USE THIS WHEN:
+ * - You want to apply consistent theming across your app
+ * - You need to adjust global background, foreground, or font styling
+ * - You are integrating Tailwind CSS with custom properties and themes
+ */
 @import "tailwindcss";
 
 :root {
