@@ -4,6 +4,7 @@
 // This API route handles POST requests to generate chatbot responses using OpenAI's GPT model.
 // It formats the prompt with a system message defining Sara Swart's assistant behavior,
 // sends the user input to OpenAI, logs the exchange, and returns the reply.
+// It also catches OpenAI quota errors and provides a helpful billing message.
 //
 // USE THIS WHEN:
 // - You want to generate a natural language response based on recruiter questions
@@ -45,9 +46,14 @@ If Sara lacks direct experience, say “No, but her closest experience is …”
 
     return NextResponse.json({ reply })
   } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'unknown'
     console.error('OpenAI API ERROR:', err)
-    return NextResponse.json({
-      reply: `OpenAI error: ${err instanceof Error ? err.message : 'unknown'}`,
-    }, { status: 500 })
+
+    let friendlyMessage = `OpenAI error: ${errorMessage}`
+    if (errorMessage.toLowerCase().includes('quota')) {
+      friendlyMessage = `OpenAI error: Your API key may have no credits left. Check your billing settings at https://platform.openai.com/account/billing.`
+    }
+
+    return NextResponse.json({ reply: friendlyMessage }, { status: 500 })
   }
 }
