@@ -1,3 +1,27 @@
+/**
+ * page.tsx
+ *
+ * PURPOSE:
+ * This file renders the main chatbot UI for interacting with Sara’s AI assistant.
+ * It handles message display, input handling, API communication with OpenAI,
+ * dynamic scrolling, and optional email capture for follow-up.
+ *
+ * USE THIS WHEN:
+ * - You want to test or iterate on Sara's assistant interface
+ * - You are deploying the assistant with a styled, responsive chat experience
+ * - You want to gather leads or email follow-ups from engaged users
+ *
+ * FEATURES:
+ * - Dynamic chat conversation with OpenAI responses
+ * - Scroll-to-bottom behavior as new messages are added
+ * - Mobile-responsive layout and accessible design
+ * - Optional email submission logged via Google Sheets webhook
+ *
+ * REQUIREMENTS:
+ * - A working API route at `/api/chat` that returns responses
+ * - Optional: `/api/log` route to collect emails for follow-up
+ * - Environment setup via `.env.local` for OpenAI and logging credentials
+ */
 'use client'
 import { useState, useRef, useEffect } from 'react'
 

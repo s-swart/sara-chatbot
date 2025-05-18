@@ -1,3 +1,21 @@
+/**
+ * layout.tsx
+ *
+ * PURPOSE:
+ * This file defines the root layout structure for the Next.js application.
+ * It sets global fonts, wraps all pages in a consistent HTML and body tag,
+ * and applies top-level styles like antialiasing.
+ *
+ * USE THIS WHEN:
+ * - You want to apply global font settings or layout wrappers
+ * - You need to inject metadata or language configuration site-wide
+ * - You’re customizing root-level page rendering or layout behavior
+ *
+ * FEATURES:
+ * - Loads and applies Geist Sans and Geist Mono fonts via next/font
+ * - Imports global styles from `globals.css`
+ * - Renders children inside the configured layout shell
+ */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
