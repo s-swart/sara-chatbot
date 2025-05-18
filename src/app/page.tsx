@@ -21,6 +21,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { assistantName } from '../lib/constants'
 
 type Message = { role: 'user' | 'bot'; text: string }
 
@@ -73,12 +74,12 @@ export default function Home() {
     <main className="min-h-screen flex flex-col justify-between bg-[#d0e0da] p-4 sm:p-6">
       <div className="mx-auto max-w-2xl flex flex-col gap-4">
         <div className="bg-[#f8f8f8] flex-grow p-4 sm:p-6 rounded-xl shadow-md flex flex-col text-[#2b2b2b]">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">Chat with Sara’s AI</h1>
+          <h1 className="text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">Chat with {assistantName}’s AI</h1>
 
           <div className="flex-1 overflow-y-auto space-y-2 mb-4 sm:mb-6">
             {messages.length === 0 && (
               <p className="text-center text-gray-700 py-20 text-lg italic">
-                Ask about Sara’s experience…
+                Ask about {assistantName}’s experience…
               </p>
             )}
 
