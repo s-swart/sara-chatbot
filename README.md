@@ -17,7 +17,7 @@ A personal AI assistant designed to help recruiters and hiring managers learn ab
 - **Framework:** Next.js (App Router)  
 - **Styling:** Tailwind CSS  
 - **API:** OpenAI (via GPT-4o)  
-- **Logging:** Google Sheets Webhook  
+- **Logging:** Client-side logging to Google Sheets Webhook  
 - **Deployment:** Vercel  
 
 ---
@@ -28,7 +28,7 @@ A personal AI assistant designed to help recruiters and hiring managers learn ab
 
 - `page.tsx`: Main chat UI with message display, user input, and email capture  
 - `layout.tsx`: Global layout and font configuration  
-- `api/chat/route.ts`: Handles chat responses via OpenAI  
+- `api/chat/route.ts`: Handles chat responses via OpenAI (logging is handled on the client side)  
 - `api/log/route.ts`: Sends user input and optional email to Google Sheets  
 
 ### `public/`
@@ -90,6 +90,25 @@ The chatbot will:
 - Pass it to OpenAI with Sara’s assistant instructions
 - Return a helpful response
 - Optionally log the interaction and email
+
+---
+
+## 📊 Logging Architecture
+
+The chatbot uses client-side logging to capture key interaction data and send it to a Google Sheets webhook for review and analysis.
+
+**Flow:**
+
+1. 🧠 User sends a message or submits their email via the chat UI (`page.tsx`)
+2. 🔐 A `sessionId` is generated (if not already present) and persisted in `localStorage`
+3. 📤 The frontend sends a POST request to `/api/log` with:
+   - `userInput` and `botReply` (for chat interactions)
+   - or `email` (for follow-up)
+   - plus `sessionId`, `userAgent`, and `ip`
+4. 📄 The `/api/log` route formats and forwards the data to a configured Google Sheets webhook
+5. 📊 Google Sheets receives the data for review, grouped by session ID
+
+This setup enables full visibility into chatbot usage while respecting user privacy.
 
 ---
 

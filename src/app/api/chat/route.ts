@@ -4,7 +4,7 @@
 // This API route handles POST requests to generate chatbot responses using OpenAI's GPT model.
 // It supports optional semantic search using embeddings and Supabase to provide context-aware answers.
 // The route formats the prompt with a system message defining Sara Swart's assistant behavior,
-// sends the user input to OpenAI, logs the exchange, and returns the reply.
+// The route formats the prompt with a system message…, generates a reply, and returns it. Logging is handled client-side.
 // It also handles OpenAI quota errors and provides a helpful billing message.
 //
 // USE THIS WHEN:
