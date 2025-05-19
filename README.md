@@ -1,4 +1,4 @@
-# 🤖 Sara Chatbot
+# 🤖 Sara Chatbot 
 
 A personal AI assistant designed to help recruiters and hiring managers learn about Sara's (or your configured persona's) professional background, leadership style, and accomplishments. Built using Next.js, Tailwind CSS, and OpenAI APIs, this chatbot delivers context-aware answers and invites users to leave their email for follow-up.
 
