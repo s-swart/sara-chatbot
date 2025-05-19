@@ -58,8 +58,10 @@ export default function Home() {
 
   async function send() {
     if (!input.trim()) return
+    // Ensure sessionId is loaded before sending any requests
+    if (!sessionId) return
     const userMsg: Message = { role: 'user', text: input.trim() }
-    setMessages(prev => [...prev, userMsg])
+    setMessages(prev => [...prev, userMsg, { role: 'bot', text: 'Thinking...' }])
     setInput('')
     setLoading(true)
 
@@ -69,16 +71,36 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMsg.text,
-          sessionId: sessionId || undefined,
+          sessionId: sessionId,
         }),
       })
       const data = await res.json()
       const botMsg: Message = { role: 'bot', text: data.reply }
-      setMessages(prev => [...prev, botMsg])
+      setMessages(prev => {
+        const newMessages = [...prev]
+        newMessages[newMessages.length - 1] = botMsg
+        return newMessages
+      })
+      // Log only if both reply and sessionId are present, and only once per message
+      if (data.reply && sessionId) {
+        await fetch('/api/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userInput: userMsg.text,
+            botReply: data.reply,
+            sessionId: sessionId,
+          }),
+        })
+      }
     } catch (e) {
       console.error(e)
       const botMsg: Message = { role: 'bot', text: 'Sorry – something went wrong.' }
-      setMessages(prev => [...prev, botMsg])
+      setMessages(prev => {
+        const newMessages = [...prev]
+        newMessages[newMessages.length - 1] = botMsg
+        return newMessages
+      })
     } finally {
       setLoading(false)
     }
@@ -165,11 +187,7 @@ export default function Home() {
               </div>
             ))}
 
-            {loading && (
-              <div className="p-3 text-base leading-relaxed rounded-lg max-w-[80%] bg-[#e6eae9] mr-auto text-[#2b2b2b] italic">
-                Thinking...
-              </div>
-            )}
+            {/* Removed loading && <div>Thinking...</div> block as "Thinking..." is now a placeholder message */}
             <div ref={endRef} />
           </div>
 

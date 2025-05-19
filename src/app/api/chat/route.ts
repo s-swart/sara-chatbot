@@ -48,7 +48,7 @@ export async function POST(req: Request) {
           body: JSON.stringify({
             query_embedding: embedding,
             // Slightly relaxed threshold to improve recall on narrow queries like "pricing" or "RevOps"
-            match_threshold: 0.75, // relaxed threshold
+            match_threshold: 0.80, // relaxed threshold
             match_count: 6
           })
         })
@@ -109,12 +109,7 @@ Avoid fabricating specific experiences or job titles that are not explicitly sta
         "I don’t have exact details on that, but here's what I can share from the general context I know:\n\n" + reply;
     }
 
-    // Log user input and bot reply for auditing and improvement
-    await fetch(`${req.headers.get('origin') || ''}/api/log`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userInput: message, botReply: finalReply }),
-    })
+
 
     return NextResponse.json({ reply: finalReply })
   } catch (err) {
