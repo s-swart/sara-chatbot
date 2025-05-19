@@ -14,3 +14,4 @@
 // The global name for the assistant.
 // Change this value to update the assistant's name everywhere in the app.
 export const assistantName = 'Sara' // change this to update the assistant name globally
+export const assistantPossessive = process.env.NEXT_PUBLIC_ASSISTANT_POSSESSIVE || `${assistantName}’s`

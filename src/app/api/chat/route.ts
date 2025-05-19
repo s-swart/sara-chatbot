@@ -24,14 +24,9 @@ import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 import { NextResponse } from 'next/server'
 import { OpenAI } from 'openai'
-
+import { assistantName, assistantPossessive } from '@/lib/constants'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-const assistantPersona = {
-  name: "Sara",
-  possessive: "Sara's",
-}
 
 async function getEmbedding(message: string): Promise<number[]> {
   const embeddingResponse = await openai.embeddings.create({
@@ -81,7 +76,7 @@ function buildPrompt(contextText: string, message: string): ChatCompletionMessag
   return [
     {
       role: 'system',
-      content: `You are ${assistantPersona.possessive} AI assistant. Use the provided context to answer questions.
+      content: `You are ${assistantPossessive} AI assistant. Use the provided context to answer questions.
 If the answer is not directly in the context, you may still answer using relevant generalizations or summaries based on the provided information.
 Avoid fabricating specific experiences or job titles that are not explicitly stated.`,
     },
@@ -97,7 +92,7 @@ Avoid fabricating specific experiences or job titles that are not explicitly sta
 
 function formatReply(reply: string, contextText: string): string {
   if (!contextText && reply.trim().startsWith("Sorry")) {
-    return `Based on the information I have, I’m not sure about that. You might want to ask ${assistantPersona.name} directly!`
+    return `Based on the information I have, I’m not sure about that. You might want to ask ${assistantName} directly!`
   } else if (!contextText) {
     return "I don’t have exact details on that, but here's what I can share from the general context I know:\n\n" + reply
   }
