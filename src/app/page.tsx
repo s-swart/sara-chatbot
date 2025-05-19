@@ -222,6 +222,7 @@ export default function Home() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && submitEmail()}
                   className="flex-1 border border-[#2d2f35] rounded p-2 shadow-sm text-[#2b2b2b] bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2d2f35]"
                   placeholder="you@example.com"
                 />
