@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = body.email
-      ? { timestamp, email: body.email, ip, userAgent }
-      : { timestamp, userInput: body.userInput, botReply: body.botReply, ip, userAgent }
+      ? { timestamp, email: body.email, ip, userAgent, sessionId: body.sessionId }
+      : { timestamp, userInput: body.userInput, botReply: body.botReply, ip, userAgent, sessionId: body.sessionId }
 
     const result = await fetch(webhookUrl, {
       method: 'POST',

@@ -17,13 +17,16 @@
  * - A working API route at `/api/chat` that returns context-aware responses
  * - `react-markdown` package installed for rendering bot replies
  * - Environment setup via `.env.local` for OpenAI and logging credentials
+ * - `react-icons` package installed for feedback buttons (👍 👎 ❤️)
  */
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { assistantName } from '../lib/constants'
+// import { FaThumbsUp, FaThumbsDown, FaHeart } from 'react-icons/fa'
+// (Retained for future reactivation of feedback UI)
 
-type Message = { role: 'user' | 'bot'; text: string }
+type Message = { role: 'user' | 'bot'; text: string; feedback?: 'up' | 'down' | 'heart' }
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -31,11 +34,25 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [emailSubmitted, setEmailSubmitted] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Generate a persistent sessionId and store in localStorage
+  useEffect(() => {
+    let sid = localStorage.getItem('sessionId')
+    if (!sid) {
+      // Simple UUID v4 generator (not cryptographically secure)
+      sid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (Number(c) ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (Number(c) / 4)))).toString(16)
+      )
+      localStorage.setItem('sessionId', sid)
+    }
+    setSessionId(sid)
+  }, [])
 
   async function send() {
     if (!input.trim()) return
@@ -48,13 +65,18 @@ export default function Home() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg.text }),
+        body: JSON.stringify({
+          message: userMsg.text,
+          sessionId: sessionId || undefined,
+        }),
       })
       const data = await res.json()
-      setMessages(prev => [...prev, { role: 'bot', text: data.reply }])
+      const botMsg: Message = { role: 'bot', text: data.reply }
+      setMessages(prev => [...prev, botMsg])
     } catch (e) {
       console.error(e)
-      setMessages(prev => [...prev, { role: 'bot', text: 'Sorry – something went wrong.' }])
+      const botMsg: Message = { role: 'bot', text: 'Sorry – something went wrong.' }
+      setMessages(prev => [...prev, botMsg])
     } finally {
       setLoading(false)
     }
@@ -65,10 +87,30 @@ export default function Home() {
     await fetch('/api/log', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({
+        email,
+        sessionId: sessionId || undefined,
+      }),
     })
     setEmailSubmitted(true)
   }
+
+  // --- FEEDBACK HANDLER TEMPORARILY DISABLED ---
+  // The feedback handler is commented out while the feedback UI is inactive.
+  /*
+  function handleFeedback(index: number, type: 'up' | 'down' | 'heart') {
+    setMessages(prev => {
+      const newMessages = [...prev]
+      const msg = newMessages[index]
+      if (msg.feedback === type) {
+        delete msg.feedback
+      } else {
+        msg.feedback = type
+      }
+      return newMessages
+    })
+  }
+  */
 
   return (
     <main className="min-h-screen flex flex-col justify-between bg-[#d0e0da] p-4 sm:p-6">
@@ -92,7 +134,32 @@ export default function Home() {
                     : 'bg-[#e6eae9] mr-auto text-gray-800'
                 }`}
               >
-                {m.role === 'bot' ? <ReactMarkdown>{m.text}</ReactMarkdown> : m.text}
+                {m.role === 'bot' ? (
+                  <>
+                    <ReactMarkdown>{m.text}</ReactMarkdown>
+                    {/* Feedback icons are currently disabled due to issues with UI state persistence and logging
+                    <div className="flex gap-3 mt-2 text-xl">
+                      <FaThumbsUp
+                        className={`cursor-pointer ${m.feedback === 'up' ? 'text-green-600' : 'text-gray-500'} hover:text-green-600`}
+                        onClick={() => handleFeedback(i, 'up')}
+                        aria-label="Thumbs up feedback"
+                      />
+                      <FaThumbsDown
+                        className={`cursor-pointer ${m.feedback === 'down' ? 'text-red-600' : 'text-gray-500'} hover:text-red-600`}
+                        onClick={() => handleFeedback(i, 'down')}
+                        aria-label="Thumbs down feedback"
+                      />
+                      <FaHeart
+                        className={`cursor-pointer ${m.feedback === 'heart' ? 'text-pink-600' : 'text-gray-500'} hover:text-pink-600`}
+                        onClick={() => handleFeedback(i, 'heart')}
+                        aria-label="Heart feedback"
+                      />
+                    </div>
+                    */}
+                  </>
+                ) : (
+                  m.text
+                )}
               </div>
             ))}
 
