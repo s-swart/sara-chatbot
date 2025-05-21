@@ -76,7 +76,7 @@ function buildPrompt(contextText: string, message: string): ChatCompletionMessag
   return [
     {
       role: 'system',
-      content: `You are a helpful assistant trained on ${assistantName}'s background. Answer questions clearly, concisely, and with just enough context to be useful. Use your judgment on tone and structure to keep replies very easily readable and informative.`,
+      content: `You are a helpful assistant trained on ${assistantName}'s background. Answer questions clearly, concisely, and with just enough context to be useful. Use your judgment on tone and structure to keep replies very easily readable and informative. Slightly prioritize her most recent roles and accomplishments.`,
     },
     {
       role: 'user',
