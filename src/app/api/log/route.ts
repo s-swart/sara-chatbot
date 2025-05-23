@@ -12,6 +12,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
+// 🪵 Branch between dev and prod Google Sheets logging webhooks
+// This lets dev logs go to a separate tab or file for analysis
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -20,15 +22,20 @@ export async function POST(req: NextRequest) {
     const userAgent = req.headers.get('user-agent') || 'unknown'
     const timestamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
 
-    const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL
+    const isDev = process.env.CHAT_MODE === 'dev' || process.env.NODE_ENV === 'development'
+    const webhookUrl = isDev
+      ? process.env.GOOGLE_SHEETS_WEBHOOK_URL_DEV
+      : process.env.GOOGLE_SHEETS_WEBHOOK_URL
     if (!webhookUrl) {
       console.error('Missing LOG_WEBHOOK_URL')
       return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
     }
 
+    const sheetTab = isDev ? 'Dev Logs' : undefined
+
     const payload = body.email
-      ? { timestamp, email: body.email, ip, userAgent, sessionId: body.sessionId }
-      : { timestamp, userInput: body.userInput, botReply: body.botReply, ip, userAgent, sessionId: body.sessionId }
+      ? { timestamp, email: body.email, ip, userAgent, sessionId: body.sessionId, sheetTab }
+      : { timestamp, userInput: body.userInput, botReply: body.botReply, ip, userAgent, sessionId: body.sessionId, sheetTab }
 
     const result = await fetch(webhookUrl, {
       method: 'POST',

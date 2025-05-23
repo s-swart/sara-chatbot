@@ -108,7 +108,8 @@ function handleOpenAIError(err: unknown): string {
   return `Sorry, something went wrong. Please try rephrasing your question or come back later.`
 }
 
-export async function POST(req: Request) {
+// ✅ PROD chat handler — main logic extracted from POST
+async function handleProdChatRequest(req: Request) {
   const { message } = await req.json()
   if (!message) return NextResponse.json({ reply: 'No input.' }, { status: 400 })
 
@@ -144,4 +145,51 @@ export async function POST(req: Request) {
     const friendlyMessage = handleOpenAIError(err)
     return NextResponse.json({ reply: friendlyMessage }, { status: 500 })
   }
+}
+
+// 🧪 DEV chat handler — development version with full logic and logging
+async function handleDevChatRequest(req: Request) {
+  const { message } = await req.json()
+  if (!message) return NextResponse.json({ reply: 'No input.' }, { status: 400 })
+
+  try {
+    const { searchParams } = new URL(req.url)
+    const useEmbeddings = searchParams.get('embeddings') !== 'false'
+
+    let matches: MatchResult[] = []
+    let contextText = ''
+
+    if (useEmbeddings) {
+      try {
+        const embedding = await getEmbedding(message)
+        matches = await fetchSemanticMatches(embedding)
+        contextText = buildContext(matches)
+      } catch (e) {
+        console.warn('⚠️ Dev embedding-based match failed, proceeding without matches:', e)
+      }
+    }
+
+    const messages = buildPrompt(contextText, message)
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages,
+      temperature: 0.7,
+    })
+
+    const rawReply = completion.choices[0]?.message?.content ?? '…'
+    const finalReply = formatReply(rawReply, contextText)
+
+    return NextResponse.json({ reply: finalReply })
+  } catch (err) {
+    const friendlyMessage = handleOpenAIError(err)
+    return NextResponse.json({ reply: friendlyMessage }, { status: 500 })
+  }
+}
+
+// 🚦 Branch between dev and prod chat handlers
+export async function POST(req: Request) {
+  const mode = process.env.CHAT_MODE || process.env.NODE_ENV
+  return mode === 'development' || mode === 'dev'
+    ? handleDevChatRequest(req)
+    : handleProdChatRequest(req)
 }
