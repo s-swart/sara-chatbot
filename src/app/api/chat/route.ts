@@ -1,3 +1,4 @@
+const VERBOSE_LOGGING = process.env.VERBOSE_LOGGING === 'true'
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 // route.ts (chat endpoint)
 //
@@ -41,6 +42,7 @@ type MatchResult = {
   content?: string
   chunk?: string
   similarity: number
+  recency_score?: number
 }
 
 async function fetchSemanticMatches(embedding: number[]): Promise<MatchResult[]> {
@@ -59,7 +61,19 @@ async function fetchSemanticMatches(embedding: number[]): Promise<MatchResult[]>
   })
 
   if (!supabaseResponse.ok) throw new Error(`Supabase error: ${supabaseResponse.statusText}`)
-  return await supabaseResponse.json()
+  return (await supabaseResponse.json()).map((match: {
+    id: string
+    content?: string
+    chunk?: string
+    similarity: number
+    metadata?: {
+      recency_score?: number
+      [key: string]: unknown
+    }
+  }) => ({
+    ...match,
+    recency_score: match.metadata?.recency_score ?? 1.0,
+  }))
 }
 
 function buildContext(matches: MatchResult[]): string {
@@ -69,7 +83,16 @@ function buildContext(matches: MatchResult[]): string {
   }
 
   console.log(`Found ${matches.length} semantic matches for context.`)
-  return matches.map((m) => m.content || m.chunk || '').join('\n\n')
+  return matches
+    .sort((a, b) => {
+      const simA = a.similarity ?? 0
+      const simB = b.similarity ?? 0
+      const recA = a.recency_score ?? 1
+      const recB = b.recency_score ?? 1
+      return recB * simB - recA * simA
+    })
+    .map((m) => m.content || m.chunk || '')
+    .join('\n\n')
 }
 
 function buildPrompt(contextText: string, message: string): ChatCompletionMessageParam[] {
@@ -124,9 +147,18 @@ async function handleProdChatRequest(req: Request) {
       try {
         const embedding = await getEmbedding(message)
         matches = await fetchSemanticMatches(embedding)
+        // 🧠 Debug: Show raw matches with recency and similarity
+        if (VERBOSE_LOGGING) {
+          console.log('🧠 Raw Matches with Recency and Similarity:')
+          matches.forEach((m, idx) => {
+            console.log(
+              `#${idx + 1}: sim=${(m.similarity ?? 0).toFixed(3)}, recency=${(m.recency_score ?? 1).toFixed(2)}, content="${(m.content || m.chunk || '').slice(0, 60)}..."`
+            )
+          })
+        }
         contextText = buildContext(matches)
       } catch (e) {
-        console.warn('⚠️ Embedding-based match failed, proceeding without matches:', e)
+        console.warn('⚠️ Dev embedding-based match failed, proceeding without matches:', e)
       }
     }
 
@@ -163,6 +195,15 @@ async function handleDevChatRequest(req: Request) {
       try {
         const embedding = await getEmbedding(message)
         matches = await fetchSemanticMatches(embedding)
+        // 🧠 Debug: Show raw matches with recency and similarity
+        if (VERBOSE_LOGGING) {
+          console.log('🧠 Raw Matches with Recency and Similarity:')
+          matches.forEach((m, idx) => {
+            console.log(
+              `#${idx + 1}: sim=${(m.similarity ?? 0).toFixed(3)}, recency=${(m.recency_score ?? 1).toFixed(2)}, content="${(m.content || m.chunk || '').slice(0, 60)}..."`
+            )
+          })
+        }
         contextText = buildContext(matches)
       } catch (e) {
         console.warn('⚠️ Dev embedding-based match failed, proceeding without matches:', e)
